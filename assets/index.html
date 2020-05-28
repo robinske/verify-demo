@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Login with SMS</title>
+    <title>Login with Twilio Verify</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
       rel="stylesheet"
@@ -31,22 +31,44 @@
       <p>
         This example shows how to deploy 
         <a href="https://twilio.com/docs/verify/api">Twilio Verify</a> 
-        and Twilio functions for serverless phone verification.
+        and Twilio functions for serverless user verification.
       </p>
       <div class="content">
-        <p>
-          Enter your phone number below:
-        </p>
-        <form id="sms-login" style="display: flex; align-items: center;">
-          <input
-            type="tel"
-            id="phone_number"
-            class="form-control" />
-          <input
-            type="submit"
-            class="btn btn-primary"
-            value="Login via SMS"
-            style="margin-left: 8px;"/>
+        <form id="login">
+          <div class="form-group" id="channel-select">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="channel" id="channel-sms" value="sms" checked>
+              <label class="form-check-label" for="channel-sms">SMS</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="channel" id="channel-call" value="call">
+              <label class="form-check-label" for="channel-call">Call</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="channel" id="channel-email" value="email">
+              <label class="form-check-label" for="channel-email">Email</label>
+            </div>
+          </div>
+          <div class="form-group phone-input">
+            <p>Enter your phone number:</p>
+            <input
+              type="tel"
+              id="phone_number"
+              class="form-control" />
+          </div>
+          <div class="form-group email-input" style="display:none;">
+            <p>Enter your email:</p>
+            <input
+              type="email"
+              id="email"
+              class="form-control" />
+          </div> 
+          <div class="form-group">
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Verify"/>
+          </div>
         </form>
         <span id="form-error" class="text-danger"></span>
       </div>
@@ -90,6 +112,17 @@
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.11/js/utils.js"
     });
 
+    document.getElementById("channel-select").addEventListener("change", event => {
+      const channel = $("input[name='channel']:checked").val();
+      if (channel === "email") {
+        $(".phone-input").hide();
+        $(".email-input").show();
+      } else if (channel === "sms" || channel === "call") {
+        $(".phone-input").show();
+        $(".email-input").hide();
+      }
+    });
+
     function flashStatus(alertType, message) {
       var content = $(".result-message");
       content.empty();
@@ -102,13 +135,17 @@
       content.append(`Error: ${error}`);
     }
 
-    document.getElementById("sms-login").addEventListener("submit", event => {
+    document.getElementById("login").addEventListener("submit", event => {
       event.preventDefault();
       const phoneNumber = phoneInput.getNumber();
+      const email = $("#email").val();
+      const channel = $("input[name='channel']:checked").val();
 
       // Twilio functions do not accept multipart/form-data
       const data = new URLSearchParams();
       data.append("phone_number", phoneNumber);
+      data.append("email", email);
+      data.append("channel", channel);
 
       // Create your own Twilio Function 
       // https://www.twilio.com/console/functions/manage
@@ -124,7 +161,7 @@
         .then((json) => {
           if (json.success) {
             $("#form-error").empty();
-            showModal(phoneNumber);
+            showModal(phoneNumber, email);
             console.log("Successfully sent token.");
           } else {
             console.log(json.message);
@@ -137,7 +174,7 @@
         });
     });
 
-    function showModal(phoneNumber) {
+    function showModal(phoneNumber, email) {
       $(".modal").modal("show");
 
       document
@@ -149,6 +186,7 @@
           // Twilio functions do not accept multipart/form-data
           const data = new URLSearchParams();
           data.append("phone_number", phoneNumber);
+          data.append("email", email);
           data.append("verification_code", code);
 
           // Create your own Twilio Function 
