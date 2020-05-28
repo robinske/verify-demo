@@ -18,7 +18,7 @@ exports.handler = function(context, event, callback) {
   // response.appendHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   // response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (typeof event.phone_number === 'undefined') {
+  if (typeof event.phone_number === 'undefined' || typeof event.email === 'undefined') {
     response.setBody({
       "status": false,
       "message": "Please provide a phone number."
@@ -29,30 +29,12 @@ exports.handler = function(context, event, callback) {
 
   const client = context.getTwilioClient();
   const service = context.VERIFY_SERVICE_SID;
-  const to = event.phone_number;
   const channel = (typeof event.channel === 'undefined') ? "sms" : event.channel;
-          
-  client.verify.services(service)
-    .verifications
-    .create({to: to, channel: channel})
-    .then(verification => {
-      response.setBody({
-        "success": true,
-        "to": to,
-        "channel": channel,
-        "sid": verification.sid
-      });
-      response.setStatusCode(200);
-      console.log(`Sent verification to **********${to.slice(-2)}`);
-      callback(null, response);
-    })
-    .catch(error => {
-      response.setBody({
-        "success": false,
-        "message": error
-      })
-      response.setStatusCode(400);
-      console.log(response);
-      callback(null, response);
-    });
+  const to = (channel === 'email') ? event.email : event.phone_number;
+
+  // TODO - send verification
+
+  response.setStatusCode(200);
+  response.setBody({"success": true});
+  callback(null, response);
 };

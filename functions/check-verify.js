@@ -18,10 +18,10 @@ exports.handler = function(context, event, callback) {
   // response.appendHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   // response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (typeof event.verification_code === "undefined" || typeof event.phone_number === "undefined") {
+  if (typeof event.verification_code === "undefined" || typeof event.to === "undefined") {
     response.setBody({
       "status": false,
-      "message": "Missing parameter. Please provide both phone_number and verification_code."
+      "message": "Missing parameter."
     })
     response.setStatusCode(400);
     return callback(null, response);
@@ -29,32 +29,13 @@ exports.handler = function(context, event, callback) {
 
   const client = context.getTwilioClient();
   const service = context.VERIFY_SERVICE_SID
-  const to = event.phone_number;
+  const to = event.to;
   const code = event.verification_code;
           
-  client.verify.services(service)
-    .verificationChecks
-    .create({to: to, code: code})
-    .then(check => {
-      if (check.status == "approved") {
-        check.success = true;
-        response.setBody(check);
-        response.setStatusCode(200);
-        callback(null, response);
-      } else {
-        response.setBody({
-          "success": false,
-          "message": "Incorrect code."
-        })
-        callback(null, response);
-      }
-    })
-    .catch(error => {
-      response.setBody({
-        "success": false,
-        "message": error
-      })
-      response.setStatusCode(400);
-      callback(null, response);
-    });
+  
+  // TODO - check verification
+
+  response.setStatusCode(200);
+  response.setBody({"success": true});
+  callback(null, response);
 };
