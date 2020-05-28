@@ -31,6 +31,11 @@ exports.handler = function(context, event, callback) {
   const service = context.VERIFY_SERVICE_SID;
   const channel = (typeof event.channel === 'undefined') ? "sms" : event.channel;
   const to = (channel === 'email') ? event.email : event.phone_number;
+  const language = (typeof event.language === 'undefined') ? "en" : event.language;
+
+  console.log(channel);
+  console.log(to);
+  console.log(language);
 
   // TODO - send verification
 

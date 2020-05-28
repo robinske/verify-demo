@@ -19,6 +19,11 @@
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
     <div class="container">
@@ -140,12 +145,14 @@
       const phoneNumber = phoneInput.getNumber();
       const email = $("#email").val();
       const channel = $("input[name='channel']:checked").val();
+      const language = $("#select-language").val();
 
       // Twilio functions do not accept multipart/form-data
       const data = new URLSearchParams();
       data.append("phone_number", phoneNumber);
       data.append("email", email);
       data.append("channel", channel);
+      data.append("language", language);
 
       // Create your own Twilio Function 
       // https://www.twilio.com/console/functions/manage
