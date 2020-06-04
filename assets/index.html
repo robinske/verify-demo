@@ -85,7 +85,7 @@
                 <div class="col-lg-12">
                   <div class="result-message"></div>
                   <div>
-                    <form id="sms-verification" class="input-group input-group-lg">
+                    <form id="verification" class="input-group input-group-lg">
                       <input
                         type="text"
                         class="form-control input-lg"
@@ -109,7 +109,8 @@
     </div><!-- /.container -->
   </body>
   <script>
-    // Format phone number input field
+    // Handle international prefixes, format phone input field 
+    // Uses intl-tel-input library
     const phoneInputField = document.querySelector("#phone_number");
     const phoneInput = window.intlTelInput(phoneInputField, {
       separateDialCode: true,
@@ -117,7 +118,7 @@
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.11/js/utils.js"
     });
 
-    document.getElementById("channel-select").addEventListener("change", event => {
+    $("#channel-select").change(function() {
       const channel = $("input[name='channel']:checked").val();
       if (channel === "email") {
         $(".phone-input").hide();
@@ -128,19 +129,22 @@
       }
     });
 
-    function flashStatus(alertType, message) {
+    function showVerificationStatus(alertType, message) {
       var content = $(".result-message");
       content.empty();
-      content.append(`<div class="alert alert-${alertType}" role="alert">${message}</div>`);
+      content.append($("<div>")
+        .addClass(`alert alert-${alertType}`)
+        .attr("role", "alert")
+        .text(message))
     }
 
-    function startError(error) {
+    function showVerificationStartError(error) {
       var content = $("#form-error");
       content.empty();
       content.append(`Error: ${error}`);
     }
 
-    document.getElementById("login").addEventListener("submit", event => {
+    $("#login").submit(function(event) {
       event.preventDefault();
       const phoneNumber = phoneInput.getNumber();
       const email = $("#email").val();
@@ -154,8 +158,6 @@
       data.append("channel", channel);
       data.append("language", language);
 
-      // Create your own Twilio Function 
-      // https://www.twilio.com/console/functions/manage
       fetch("./start-verify", {
           method: "POST",
           body: data
@@ -172,11 +174,11 @@
             console.log("Successfully sent token.");
           } else {
             console.log(json.message);
-            startError(`${json.message.message}. <a href="${json.message.moreInfo}">[more info]</a>`);
+            showVerificationStartError(`${json.message.message}. <a href="${json.message.moreInfo}">[more info]</a>`);
           }
         })
         .catch((err) => {
-          startError("Error starting verification. Check console.");
+          showVerificationStartError("Error starting verification. Check console.");
           console.log(err);
         });
     });
@@ -184,9 +186,7 @@
     function showModal(phoneNumber, email) {
       $(".modal").modal("show");
 
-      document
-        .getElementById("sms-verification")
-        .addEventListener("submit", event => {
+      $("#verification").submit(function(event) {
           event.preventDefault();
           const code = $("#verification_code").val();
 
@@ -196,8 +196,6 @@
           data.append("email", email);
           data.append("verification_code", code);
 
-          // Create your own Twilio Function 
-          // https://www.twilio.com/console/functions/manage
           fetch("./check-verify", {
               method: 'POST',
               body: data
@@ -205,13 +203,13 @@
             .then(response => response.json())
             .then((json) => {
               if (json.success) {
-                flashStatus("success", "Success!");
+                showVerificationStatus("success", "Success!");
                 console.log("Successfully verified the token.");
               } else if (!json.success && json.message == "Incorrect code.") {
-                flashStatus("danger", "Incorrect token.");
+                showVerificationStatus("danger", "Incorrect token.");
                 $("#verification_code").val("");
               } else {
-                flashStatus("danger", `Something went wrong! ${json.message.message}`);
+                showVerificationStatus("danger", `Something went wrong! ${json.message}`);
                 $("#verification_code").val("");
                 console.log(json.message);
               }
@@ -222,8 +220,6 @@
             });
         });
     }
-
-    const select = document.getElementById("select-language"); 
 
     const languages = [
       { text: "English", value: "en" },
@@ -264,13 +260,12 @@
       { text: "Vietnamese", value: "vi" }
     ];
 
-    for(var i = 0; i < languages.length; i++) {
-        var opt = languages[i];
+    const selectLanguage = $("#select-language"); 
     
-        var el = document.createElement("option");
-        el.textContent = opt.text;
-        el.value = opt.value;
-        select.appendChild(el);
-    };
+    languages.forEach(l => {
+      selectLanguage.append($("<option>")
+        .val(l.value)
+        .text(l.text))
+    }); 
   </script>
 </html>
