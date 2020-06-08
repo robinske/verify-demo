@@ -204,6 +204,7 @@
             .then((json) => {
               if (json.success) {
                 showVerificationStatus("success", "Success!");
+                $("#verification_code").val("");
                 console.log("Successfully verified the token.");
               } else if (!json.success && json.message == "Incorrect code.") {
                 showVerificationStatus("danger", "Incorrect token.");
