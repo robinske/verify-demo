@@ -18,7 +18,9 @@ exports.handler = function(context, event, callback) {
   // response.appendHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   // response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (typeof event.verification_code === "undefined" || typeof event.to === "undefined") {
+  if (typeof event.verification_code === "undefined" ||
+      typeof event.phone_number === "undefined" ||
+      typeof event.email === "undefined") {
     response.setBody({
       "status": false,
       "message": "Missing parameter."
@@ -28,8 +30,8 @@ exports.handler = function(context, event, callback) {
   }
 
   const client = context.getTwilioClient();
-  const service = context.VERIFY_SERVICE_SID
-  const to = event.to;
+  const service = context.VERIFY_SERVICE_SID;
+  const to = (typeof event.phone_number != "undefined") ? event.phone_number : event.email;
   const code = event.verification_code;
           
   

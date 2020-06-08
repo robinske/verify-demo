@@ -215,7 +215,7 @@
               }
             })
             .catch((err) => {
-              var content = $(".result-message");
+              showVerificationStatus("danger", `Something went wrong! ${err}`);
               console.log(err);
             });
         });
