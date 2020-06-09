@@ -113,6 +113,7 @@
     // Uses intl-tel-input library
     const phoneInputField = document.querySelector("#phone_number");
     const phoneInput = window.intlTelInput(phoneInputField, {
+      preferredCountries: ["us", "au", "hk", "in", "id", "jp", "ph", "sg"],
       separateDialCode: true,
       utilsScript:
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.11/js/utils.js"
