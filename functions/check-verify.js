@@ -7,6 +7,13 @@
  *  - Create a Verify Service (https://www.twilio.com/console/verify/services)
  *  - Add VERIFY_SERVICE_SID from above to your Environment Variables (https://www.twilio.com/console/functions/configure)
  *  - Enable ACCOUNT_SID and AUTH_TOKEN in your functions configuration (https://www.twilio.com/console/functions/configure)
+ *
+ *
+ *  Returns JSON:
+ *  {
+ *    "success": boolean,
+ *    "message": string
+ *  }
  */
 
 exports.handler = function(context, event, callback) {
@@ -22,7 +29,7 @@ exports.handler = function(context, event, callback) {
       typeof event.phone_number === "undefined" ||
       typeof event.email === "undefined") {
     response.setBody({
-      "status": false,
+      "success": false,
       "message": "Missing parameter."
     })
     response.setStatusCode(400);
@@ -38,6 +45,9 @@ exports.handler = function(context, event, callback) {
   // TODO - check verification
 
   response.setStatusCode(200);
-  response.setBody({"success": true});
+  response.setBody({
+    "success": true,
+    "message": "Verified!"
+  });
   callback(null, response);
 };

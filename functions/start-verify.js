@@ -7,6 +7,16 @@
  *  - Create a Verify Service (https://www.twilio.com/console/verify/services)
  *  - Add VERIFY_SERVICE_SID from above to your Environment Variables (https://www.twilio.com/console/functions/configure)
  *  - Enable ACCOUNT_SID and AUTH_TOKEN in your functions configuration (https://www.twilio.com/console/functions/configure)
+ *
+ *
+ *  Returns JSON
+ *  {
+ *    "success": boolean
+ *    "error": {                // not present if success is true
+ *      "message": string,
+ *      "moreInfo": url string
+ *    }
+ *  }
  */
 
 exports.handler = function(context, event, callback) {
@@ -17,15 +27,6 @@ exports.handler = function(context, event, callback) {
   // response.appendHeader('Access-Control-Allow-Origin', '*');
   // response.appendHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   // response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (typeof event.phone_number === 'undefined' || typeof event.email === 'undefined') {
-    response.setBody({
-      "status": false,
-      "message": "Please provide a phone number."
-    })
-    response.setStatusCode(400);
-    return callback(null, response);
-  }
 
   const client = context.getTwilioClient();
   const service = context.VERIFY_SERVICE_SID;

@@ -63,11 +63,11 @@
               id="email"
               class="form-control" />
           </div> 
-          <div class="form-group language-input">
+          <!-- <div class="form-group language-input">
             <p>Select your preferred language:</p>
             <select class="form-control" id="select-language">
             </select>
-          </div>
+          </div> -->
           <div class="form-group">
             <input
               type="submit"
@@ -113,7 +113,6 @@
     // Uses intl-tel-input library
     const phoneInputField = document.querySelector("#phone_number");
     const phoneInput = window.intlTelInput(phoneInputField, {
-      preferredCountries: ["us", "au", "hk", "in", "id", "jp", "ph", "sg"],
       separateDialCode: true,
       utilsScript:
         "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.11/js/utils.js"
@@ -174,13 +173,13 @@
             showModal(phoneNumber, email);
             console.log("Successfully sent token.");
           } else {
-            console.log(json.message);
-            showVerificationStartError(`${json.message.message}. <a href="${json.message.moreInfo}">[more info]</a>`);
+            console.log(json.error);
+            showVerificationStartError(
+              `${json.error.message} <a href="${json.error.moreInfo}">[more info]</a>`);
           }
         })
         .catch((err) => {
-          showVerificationStartError("Error starting verification. Check console.");
-          console.log(err);
+          showVerificationStartError("Error starting verification.");
         });
     });
 
@@ -204,21 +203,17 @@
             .then(response => response.json())
             .then((json) => {
               if (json.success) {
-                showVerificationStatus("success", "Success!");
-                $("#verification_code").val("");
-                console.log("Successfully verified the token.");
-              } else if (!json.success && json.message == "Incorrect code.") {
-                showVerificationStatus("danger", "Incorrect token.");
+                showVerificationStatus("success", json.message);
                 $("#verification_code").val("");
               } else {
-                showVerificationStatus("danger", `Something went wrong! ${json.message}`);
+                showVerificationStatus("danger", json.message);
                 $("#verification_code").val("");
-                console.log(json.message);
               }
             })
             .catch((err) => {
-              showVerificationStatus("danger", `Something went wrong! ${err}`);
               console.log(err);
+              showVerificationStatus("danger", "Something went wrong!");
+              $("#verification_code").val("");
             });
         });
     }
