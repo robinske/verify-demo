@@ -46,7 +46,7 @@ exports.handler = function(context, event, callback) {
       locale: language
     })
     .then(verification => {
-      console.log(verification);
+      console.log(verification.sid);
       response.setStatusCode(200);
       response.setBody({"success": true});
       callback(null, response);

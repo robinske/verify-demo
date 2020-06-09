@@ -71,5 +71,6 @@ exports.handler = function(context, event, callback) {
         success: false,
         message: error.message
       });
+      callback(null, response);
     })
 };
