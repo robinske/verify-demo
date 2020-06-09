@@ -48,8 +48,7 @@ exports.handler = function(context, event, callback) {
     .then(verification => {
       console.log(verification);
       response.setStatusCode(200);
-      verification.success = true;
-      response.setBody(verification);
+      response.setBody({"success": true});
       callback(null, response);
     })
     .catch(error => {
@@ -57,7 +56,7 @@ exports.handler = function(context, event, callback) {
       response.setStatusCode(error.status);
       response.setBody({
         "success": false,
-        "message": {
+        "error": {
           "message": error.message,
           "moreInfo": error.moreInfo
         } 

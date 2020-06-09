@@ -52,25 +52,24 @@ exports.handler = function(context, event, callback) {
         response.setStatusCode(200);
         response.setBody({
           "success": true,
-          "message": "approved"
+          "message": "Verification success."
         });
         callback(null, response);
       } else {
         response.setStatusCode(401);
         response.setBody({
           "success": false,
-          "message": "Incorrect code."
+          "message": "Incorrect token."
         });
         callback(null, response);
       }
     })
     .catch(error => {
       console.log(error);
-
-      response.setStatusCode(400);
+      response.setStatusCode(error.status);
       response.setBody({
         success: false,
-        message: error
+        message: error.message
       });
     })
 };
