@@ -38,7 +38,7 @@ exports.handler = function(context, event, callback) {
 
   const client = context.getTwilioClient();
   const service = context.VERIFY_SERVICE_SID;
-  const to = (typeof event.phone_number != "undefined") ? event.phone_number : event.email;
+  const to = (event.phone_number != "") ? event.phone_number : event.email;
   const code = event.verification_code;
           
   
