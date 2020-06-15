@@ -38,9 +38,29 @@ exports.handler = function(context, event, callback) {
   console.log(to);
   console.log(language);
 
-  // TODO - send verification
-
-  response.setStatusCode(200);
-  response.setBody({"success": true});
-  callback(null, response);
+  client.verify.services(service)
+    .verifications
+    .create({
+      to: to,
+      channel: channel,
+      locale: language
+    })
+    .then(verification => {
+      console.log(verification.sid);
+      response.setStatusCode(200);
+      response.setBody({"success": true});
+      callback(null, response);
+    })
+    .catch(error => {
+      console.log(error);
+      response.setStatusCode(error.status);
+      response.setBody({
+        "success": false,
+        "error": {
+          "message": error.message,
+          "moreInfo": error.moreInfo
+        } 
+      })
+      callback(null, response)
+    })
 };

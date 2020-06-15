@@ -40,14 +40,37 @@ exports.handler = function(context, event, callback) {
   const service = context.VERIFY_SERVICE_SID;
   const to = (event.phone_number != "") ? event.phone_number : event.email;
   const code = event.verification_code;
-          
-  
-  // TODO - check verification
 
-  response.setStatusCode(200);
-  response.setBody({
-    "success": true,
-    "message": "Verified!"
-  });
-  callback(null, response);
+  client.verify.services(service)
+    .verificationChecks
+    .create({
+      to: to,
+      code: code
+    })
+    .then(check => {
+      if (check.status === "approved") {
+        response.setStatusCode(200);
+        response.setBody({
+          "success": true,
+          "message": "Verification success."
+        });
+        callback(null, response);
+      } else {
+        response.setStatusCode(401);
+        response.setBody({
+          "success": false,
+          "message": "Incorrect token."
+        });
+        callback(null, response);
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      response.setStatusCode(error.status);
+      response.setBody({
+        success: false,
+        message: error.message
+      });
+      callback(null, response);
+    })
 };
